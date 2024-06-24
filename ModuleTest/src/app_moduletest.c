@@ -84,6 +84,7 @@ VOID Moduletest_thread_entry(ULONG initial_param){
     {
         tx_thread_sleep(10);        //100ms sleep
 
+        HAL_GPIO_WritePin(TRIG1_GPIO_Port,TRIG1_Pin,GPIO_PIN_SET);
         app_buttonLed_Test();
 
 /*

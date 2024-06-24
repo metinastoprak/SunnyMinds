@@ -67,6 +67,8 @@ extern void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USER_LED2_Pin GPIO_PIN_3
 #define USER_LED2_GPIO_Port GPIOE
+#define TRIG1_Pin GPIO_PIN_7
+#define TRIG1_GPIO_Port GPIOE
 #define USER_LED1_Pin GPIO_PIN_15
 #define USER_LED1_GPIO_Port GPIOB
 #define USER_BUTTON_Pin GPIO_PIN_0
