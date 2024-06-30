@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/pc/Desktop/project/WorkSpace_SunnyMind/SunnyMinds/Core/Src",
-      "program": "c:/Users/pc/Desktop/project/WorkSpace_SunnyMind/SunnyMinds/Core/Src/build/Debug/outDebug",
+      "cwd": "c:/Users/pc/Desktop/project/WorkSpace_SunnyMind/SunnyMinds/ModuleTest/src",
+      "program": "c:/Users/pc/Desktop/project/WorkSpace_SunnyMind/SunnyMinds/ModuleTest/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -59,5 +59,6 @@
   "files.associations": {
     "app_threadx.h": "c",
     "app_moduletest.h": "c"
-  }
+  },
+  "C_Cpp.dimInactiveRegions": false
 }

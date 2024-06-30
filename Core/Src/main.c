@@ -45,6 +45,8 @@
 
 UART_HandleTypeDef hlpuart1;
 
+XSPI_HandleTypeDef hospi1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -54,6 +56,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ICACHE_Init(void);
 static void MX_LPUART1_UART_Init(void);
+static void MX_OCTOSPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -94,6 +97,7 @@ int main(void)
   MX_GPIO_Init();
   MX_ICACHE_Init();
   MX_LPUART1_UART_Init();
+  MX_OCTOSPI1_Init();
   /* USER CODE BEGIN 2 */
 
   // clear terminal screen for coolterm
@@ -178,6 +182,7 @@ void SystemClock_Config(void)
 static void MX_ICACHE_Init(void)
 {
 
+
   /* USER CODE BEGIN ICACHE_Init 0 */
 
   /* USER CODE END ICACHE_Init 0 */
@@ -246,6 +251,47 @@ static void MX_LPUART1_UART_Init(void)
 }
 
 /**
+  * @brief OCTOSPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_OCTOSPI1_Init(void)
+{
+
+  /* USER CODE BEGIN OCTOSPI1_Init 0 */
+
+  /* USER CODE END OCTOSPI1_Init 0 */
+
+  /* USER CODE BEGIN OCTOSPI1_Init 1 */
+
+  /* USER CODE END OCTOSPI1_Init 1 */
+  /* OCTOSPI1 parameter configuration*/
+  hospi1.Instance = OCTOSPI1;
+  hospi1.Init.FifoThresholdByte = 1;
+  hospi1.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
+  hospi1.Init.MemoryType = HAL_XSPI_MEMTYPE_MICRON;
+  hospi1.Init.MemorySize = HAL_XSPI_SIZE_1MB;
+  hospi1.Init.ChipSelectHighTimeCycle = 6;
+  hospi1.Init.FreeRunningClock = HAL_XSPI_FREERUNCLK_DISABLE;
+  hospi1.Init.ClockMode = HAL_XSPI_CLOCK_MODE_0;
+  hospi1.Init.WrapSize = HAL_XSPI_WRAP_NOT_SUPPORTED;
+  hospi1.Init.ClockPrescaler = 3-1;
+  hospi1.Init.SampleShifting = HAL_XSPI_SAMPLE_SHIFT_HALFCYCLE;
+  hospi1.Init.DelayHoldQuarterCycle = HAL_XSPI_DHQC_DISABLE;
+  hospi1.Init.ChipSelectBoundary = HAL_XSPI_BONDARYOF_NONE;
+  hospi1.Init.DelayBlockBypass = HAL_XSPI_DELAY_BLOCK_BYPASS;
+  hospi1.Init.Refresh = 0;
+  if (HAL_XSPI_Init(&hospi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN OCTOSPI1_Init 2 */
+
+  /* USER CODE END OCTOSPI1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -258,7 +304,9 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, USER_LED2_Pin|TRIG1_Pin, GPIO_PIN_RESET);
@@ -327,9 +375,11 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
+  //__disable_irq();
   while (1)
   {
+      HAL_Delay(150);
+      HAL_GPIO_TogglePin(USER_LED1_GPIO_Port,USER_LED1_Pin);
   }
   /* USER CODE END Error_Handler_Debug */
 }

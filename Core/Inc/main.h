@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
@@ -37,6 +38,8 @@ extern "C" {
 #include "app_moduletest.h"
 #include "app_common.h"
 #include "app_buttonled_test.h"
+#include "app_qspi_test.h"
+
 
 
 /* USER CODE END Includes */
@@ -44,6 +47,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 extern UART_HandleTypeDef hlpuart1;
+extern XSPI_HandleTypeDef hospi1;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
