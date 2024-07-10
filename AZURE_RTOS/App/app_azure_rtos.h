@@ -31,6 +31,8 @@
 #include "stm32h5xx_hal.h"
 #include "app_azure_rtos_config.h"
 
+#include "app_netxduo.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -43,7 +45,7 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define TX_APP_MEM_POOL_SIZE                     1024*3
+//#define TX_APP_MEM_POOL_SIZE                     1024*3
 
 /* USER CODE END EC */
 
