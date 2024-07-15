@@ -86,7 +86,8 @@ VOID Moduletest_thread_entry(ULONG initial_param){
 
         app_buttonLed_Test();
         app_qspi_Test();
-
+        app_IR_Test();
+        
 /*
         switch(msgTransceiver.state)
         {

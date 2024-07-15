@@ -45,7 +45,7 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-//#define TX_APP_MEM_POOL_SIZE                     1024*3
+#define TX_APP_MEM_POOL_SIZE                     1024*3
 
 /* USER CODE END EC */
 

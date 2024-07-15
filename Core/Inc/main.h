@@ -38,6 +38,8 @@ extern "C" {
 #include "app_common.h"
 #include "app_buttonled_test.h"
 #include "app_qspi_test.h"
+#include "app_ir_test.h"
+
 
 
 
@@ -47,6 +49,10 @@ extern "C" {
 /* USER CODE BEGIN ET */
 extern UART_HandleTypeDef hlpuart1;
 extern XSPI_HandleTypeDef hospi1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim17;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -59,6 +65,8 @@ extern XSPI_HandleTypeDef hospi1;
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -70,10 +78,14 @@ extern void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USER_LED2_Pin GPIO_PIN_3
 #define USER_LED2_GPIO_Port GPIOE
+#define IR_RX_Pin GPIO_PIN_5
+#define IR_RX_GPIO_Port GPIOA
 #define TRIG1_Pin GPIO_PIN_7
 #define TRIG1_GPIO_Port GPIOE
 #define USER_LED1_Pin GPIO_PIN_15
 #define USER_LED1_GPIO_Port GPIOB
+#define IR_TX_Pin GPIO_PIN_5
+#define IR_TX_GPIO_Port GPIOB
 #define USER_BUTTON_Pin GPIO_PIN_0
 #define USER_BUTTON_GPIO_Port GPIOE
 #define USER_BUTTON_EXTI_IRQn EXTI0_IRQn

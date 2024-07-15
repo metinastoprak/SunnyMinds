@@ -22,37 +22,6 @@
 ********************************************************************************/
 
 
-typedef enum _NEC_RxState{
-    NEC_RX_STATE_IDLE,
-    NEC_RX_STATE_INIT,
-    NEC_RX_HEAD_OK,
-    NEC_RX_HEAD_FAIL,
-    NEC_RX_STATE_ERROR,
-    NEC_RX_STATE_DONE,
-    NEC_RX_STATE_MAX
-}NEC_RxState;
-
-
-typedef enum _NEC_TxState{
-    NEC_TX_STATE_IDLE,
-    NEC_TX_STATE_TRANSMIT,
-    NEC_TX_STATE_FRAME_OK,
-    NEC_TX_STATE_TRANSMIT_DONE
-}NEC_TxState;
-
-typedef enum _msgState{
-    MSG_STATE_IDLE,
-    MSG_STATE_READY,
-    MSG_STATE_PROCESS,
-}msgState;
-
-typedef enum _sensor{
-    SENSOR_1,
-    SENSOR_2,
-    SENSOR_MAX
-}IRsensor;
-
-
 /*******************************************************************************
 * EXPORTED DEFS
 ********************************************************************************/
@@ -70,6 +39,13 @@ typedef enum _sensor{
 #define QUEUE_SIZE              (20<<2)
 #define MESSAGE_SIZE            5           // 5*32bit = 20char
 */
+typedef enum _testState{
+    TEST_STATE_IDLE,
+    TEST_STATE_PROCESS,
+    TEST_STATE_PASSED,
+    TEST_STATE_FAILED,
+    TEST_STATE_DONE
+}t_testState;
 
 
 /*******************************************************************************

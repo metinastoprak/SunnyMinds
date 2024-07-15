@@ -299,7 +299,8 @@ static VOID nx_app_thread_entry (ULONG thread_input)
     /* USER CODE BEGIN DHCPSemaphore get error */
     printf("[NETXAPP-THREAD] IP get error!...\r\n");
     tx_thread_relinquish();
-    Error_Handler();
+    //Error_Handler();
+    return;
     /* USER CODE END DHCPSemaphore get error */
   }
 
