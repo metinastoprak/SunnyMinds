@@ -114,6 +114,11 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
     return TX_SEMAPHORE_ERROR;
   }
 
+  /* Create Semaphore.  */
+  if (tx_semaphore_create(&semaphore_buttonpress, "Button Press", 0) != TX_SUCCESS)
+  {
+    return TX_SEMAPHORE_ERROR;
+  }
 
 
   /* USER CODE END App_ThreadX_Init */

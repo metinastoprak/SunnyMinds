@@ -55,6 +55,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
         /* Put the semaphore to release the MainThread */
          tx_semaphore_put(&semaphore_ledcheck);
     }
+    tx_semaphore_put(&semaphore_buttonpress);
   }
 }
 

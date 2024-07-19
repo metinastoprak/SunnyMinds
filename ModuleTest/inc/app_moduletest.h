@@ -56,6 +56,8 @@ INTERFACE TX_THREAD thread_Led1;
 INTERFACE TX_THREAD thread_Led2;
 
 INTERFACE TX_SEMAPHORE semaphore_ledcheck;
+INTERFACE TX_SEMAPHORE semaphore_buttonpress;
+
 
 
 /*******************************************************************************

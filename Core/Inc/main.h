@@ -39,6 +39,8 @@ extern "C" {
 #include "app_buttonled_test.h"
 #include "app_qspi_test.h"
 #include "app_ir_test.h"
+#include "app_imu_test.h"
+
 
 
 
@@ -52,7 +54,7 @@ extern XSPI_HandleTypeDef hospi1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim17;
-
+extern I2C_HandleTypeDef hi2c2;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -78,6 +80,12 @@ extern void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USER_LED2_Pin GPIO_PIN_3
 #define USER_LED2_GPIO_Port GPIOE
+#define INT1_LSM6D_Pin GPIO_PIN_2
+#define INT1_LSM6D_GPIO_Port GPIOF
+#define INT2_LSM6D_Pin GPIO_PIN_3
+#define INT2_LSM6D_GPIO_Port GPIOF
+#define SA0_LSM6D_Pin GPIO_PIN_4
+#define SA0_LSM6D_GPIO_Port GPIOF
 #define IR_RX_Pin GPIO_PIN_5
 #define IR_RX_GPIO_Port GPIOA
 #define TRIG1_Pin GPIO_PIN_7
