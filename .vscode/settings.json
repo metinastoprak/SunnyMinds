@@ -58,7 +58,8 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "app_threadx.h": "c",
-    "app_moduletest.h": "c"
+    "app_moduletest.h": "c",
+    "lis2mdl_reg.h": "c"
   },
   "C_Cpp.dimInactiveRegions": false
 }

@@ -24,5 +24,6 @@
 /* Defines ------------------------------------------------------------------*/
 /* STMicroelectronics.X-CUBE-MEMS1.10.0.0 */
 #define LSM6DSL_ACCGYR_I2C
+#define LIS2MDL_MAG_I2C
 
 #endif /* __RTE_COMPONENTS_H__ */
