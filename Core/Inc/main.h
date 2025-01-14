@@ -40,6 +40,9 @@ extern "C" {
 #include "app_qspi_test.h"
 #include "app_ir_test.h"
 #include "app_imu_test.h"
+#include "app_cli.h"
+#include "app_adc_test.h"
+
 
 
 
@@ -55,6 +58,10 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim17;
 extern I2C_HandleTypeDef hi2c2;
+extern SAI_HandleTypeDef hsai_BlockA1;
+extern ADC_HandleTypeDef hadc1;
+extern TIM_HandleTypeDef htim16;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -90,6 +97,8 @@ extern void Error_Handler(void);
 #define IR_RX_GPIO_Port GPIOA
 #define TRIG1_Pin GPIO_PIN_7
 #define TRIG1_GPIO_Port GPIOE
+#define ECHO1_Pin GPIO_PIN_8
+#define ECHO1_GPIO_Port GPIOE
 #define USER_LED1_Pin GPIO_PIN_15
 #define USER_LED1_GPIO_Port GPIOB
 #define IR_TX_Pin GPIO_PIN_5

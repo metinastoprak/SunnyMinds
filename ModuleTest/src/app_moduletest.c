@@ -54,11 +54,13 @@ const char * Generic_State[6] =    {"IDLE", \
 ********************************************************************************/
 TX_THREAD portal_ptr;
 
+uint16_t PDM_RxBuffer[128];
+
 /*******************************************************************************
 * LOCAL FUNCTION PROTOTYPES
 ********************************************************************************/
 VOID Portal_thread_entry(ULONG initial_param);
-
+void ModuleTest_Init(void);
 
 /*******************************************************************************
 * FUNCTIONS
@@ -67,6 +69,9 @@ VOID Portal_thread_entry(ULONG initial_param);
 * @brief Function Name ModuleTest_Init()
 */
 void ModuleTest_Init(void) {
+
+    app_cli_init();
+    app_qspi_Init();
 
 
 }
@@ -79,33 +84,19 @@ void ModuleTest_Init(void) {
 VOID Moduletest_thread_entry(ULONG initial_param){
     
 
-    printf("[Thread-ModuleTEST] Entry\n\r");    
+    ModuleTest_Init();
+    printf("[Thread-ModuleTEST] Entry\n\r");
+    //HAL_SAI_Receive_DMA(&hsai_BlockA1,PDM_RxBuffer,sizeof(PDM_RxBuffer));
+
     while (1)
     {
         tx_thread_sleep(10);        //100ms sleep
 
         app_buttonLed_Test();
-        app_qspi_Test();
         app_IR_Test();
         app_IMU_Test();
-        
-/*
-        switch(msgTransceiver.state)
-        {
-            case MSG_STATE_IDLE:
-            {
-                break;
-            }
-            case MSG_STATE_READY:
-            {	
-                break;
-            }
-            case MSG_STATE_PROCESS:
-            {	
-                break;
-            }
-        }
-*/
+        app_ADC_HSC_Test();
+        app_cli_handler();
 
     }
 

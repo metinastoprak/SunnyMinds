@@ -89,9 +89,9 @@
 /*******************************************************************************
 * EXPORTED FUNCTIONS
 ********************************************************************************/
-INTERFACE void app_qspi_Test(void);
-
-
+INTERFACE void app_qspi_Init(void);
+INTERFACE void app_qspi_Test(uint16_t);
+INTERFACE void flashMemTest_Callback(const char *subcommand, const char *args[], int argc);
 
 
 #undef	INTERFACE

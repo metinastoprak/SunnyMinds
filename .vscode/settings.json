@@ -59,7 +59,10 @@
   "files.associations": {
     "app_threadx.h": "c",
     "app_moduletest.h": "c",
-    "lis2mdl_reg.h": "c"
+    "lis2mdl_reg.h": "c",
+    "main.h": "c",
+    "typeinfo": "c",
+    "compare": "c"
   },
   "C_Cpp.dimInactiveRegions": false
 }

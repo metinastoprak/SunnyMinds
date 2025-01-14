@@ -91,6 +91,9 @@ typedef enum _sensor{
 * EXPORTED FUNCTIONS
 ********************************************************************************/
 INTERFACE void app_IR_Test(void);
+INTERFACE void NEC_TX_SendMarkSpace(void);
+
+INTERFACE void irTest_Callback(const char *subcommand, const char *args[], int argc);
 
 //INTERFACE void NEC_TX_SendMarkSpace(void);
 

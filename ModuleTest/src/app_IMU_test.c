@@ -37,13 +37,16 @@ static float acceleration_mg[3];
 static float angular_rate_mdps[3];
 static float temperature_degC;
 static uint8_t whoamI, rst;
-static uint8_t tx_buffer[TX_BUF_DIM];
+//static uint8_t tx_buffer[TX_BUF_DIM];
 
 static int16_t data_raw_magnetic[3];
 static float magnetic_mG[3];
 
 
 stmdev_ctx_t dev_ctx,dev_ctx_lis2mdl;
+
+static uint8_t acc_testcount = 0;
+static uint8_t mg_testcount = 0;
 
 /*******************************************************************************
 * LOCAL FUNCTION PROTOTYPES
@@ -72,6 +75,27 @@ void lis2mdl_read_data_polling(void);
 /*******************************************************************************
 * FUNCTIONS
 ********************************************************************************/
+/**
+* @brief imuTest_Callback.. IMU read data testing..
+*  
+* @retval None
+*/
+void imuTest_Callback(const char *subcommand, const char *args[], int argc){
+
+    if (strcmp(args[0],"ACC") == 0){
+        printf("\r\n[IMU-INFO] ACC testing\r\n");
+
+        HAL_GPIO_WritePin(SA0_LSM6D_GPIO_Port,SA0_LSM6D_Pin,RESET);
+        acc_testcount = 50;
+        lsm6dsl_Init();
+    }
+    else if(strcmp(args[0],"MG") == 0){
+        printf("\r\n[IMU-INFO] MG testing\r\n");
+        HAL_GPIO_WritePin(SA0_LSM6D_GPIO_Port,SA0_LSM6D_Pin,RESET);
+        mg_testcount = 50;
+        lis2mdl_Init();
+    }
+}
 
 /**
 * @brief LSM6DSL read data testing..
@@ -82,24 +106,17 @@ void app_IMU_Test(void) {
 
     ULONG currentValue = 0;
      
-    if (tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT) == TX_SUCCESS)
-    {
-        tx_semaphore_info_get(&semaphore_buttonpress, NULL, &currentValue, NULL, NULL, NULL);
-        printf("\r\n[IMU-] Test starting\r\n");
-        HAL_GPIO_WritePin(SA0_LSM6D_GPIO_Port,SA0_LSM6D_Pin,RESET);
-
-        lsm6dsl_Init();
-        while (tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT) != TX_SUCCESS) {
-            tx_thread_sleep(5);
-            lsm6dsl_read_data_polling();
-        }
-
-        lis2mdl_Init();
-        while (tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT) != TX_SUCCESS) {
-            tx_thread_sleep(5);
-            lis2mdl_read_data_polling();
-        }
-
+    if (acc_testcount > 0){
+      acc_testcount--;
+      HAL_GPIO_WritePin(SA0_LSM6D_GPIO_Port,SA0_LSM6D_Pin,RESET);
+      lsm6dsl_read_data_polling();
+      tx_thread_sleep(5);
+    }
+    if (mg_testcount > 0){
+      mg_testcount--;
+      HAL_GPIO_WritePin(SA0_LSM6D_GPIO_Port,SA0_LSM6D_Pin,RESET);
+      lis2mdl_read_data_polling();
+      tx_thread_sleep(5);
     }
 }
 
@@ -204,7 +221,8 @@ void lsm6dsl_read_data_polling(void)
       lsm6dsl_temperature_raw_get(&dev_ctx, &data_raw_temperature);
       temperature_degC = lsm6dsl_from_lsb_to_celsius(
                            data_raw_temperature );
-//      printf("Temperature [degC]:%2.2f\r\n",temperature_degC);
+      
+      //printf("Temperature [degC]:%2.2f\r\n",temperature_degC);
       //tx_com( tx_buffer, strlen( (char const *)tx_buffer ) );
     }
     printf("Acceleration [mg]:%4.2f\t%4.2f\t%4.2f\t\tAngular rate [mdps]:%4.2f\t%4.2f\t%4.2f\r\n",

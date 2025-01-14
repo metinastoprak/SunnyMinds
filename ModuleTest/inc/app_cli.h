@@ -1,22 +1,21 @@
 /*
- * app_IMU_test.h
+ * app_cli.h
  *
- *  Created on: June 01, 2024
+ *  Created on: Nov 18, 2024
  *      Author: SunnyTeknoloji
  */
 
-#ifndef APP_IMU_TEST_H
-#define APP_IMU_TEST_H
+#ifndef APP_CLI_H
+#define APP_CLI_H
 
 
 
-#ifdef  APP_IMU_TEST_C
+#ifdef  APP_CLI_C
 #define INTERFACE
 #else 
 #define INTERFACE	extern
 #endif
 
-//#include "tx_api.h"
 
 /*******************************************************************************
 * EXPORTED TYPES
@@ -26,7 +25,12 @@
 /*******************************************************************************
 * EXPORTED DEFS
 ********************************************************************************/
+#define MAX_COMMAND_LENGTH      64   
+#define MAX_SUBCOMMAND_LENGTH   16   
 
+#define MAX_SUBC_COUNT          10        
+#define MAX_ARGC_COUNT          10  
+#define INVALID_NUMBER          -1
 
 
 
@@ -37,10 +41,10 @@
 /*******************************************************************************
 * EXPORTED FUNCTIONS
 ********************************************************************************/
-INTERFACE void app_IMU_Test(void);
-INTERFACE void imuTest_Callback(const char *subcommand, const char *args[], int argc);
-
+INTERFACE void app_cli_init(void);
+INTERFACE void app_cli_handler(void);
+INTERFACE int app_cli_getNumber(const char *);
 
 
 #undef	INTERFACE
-#endif  /* APP_IMU_TEST_H */
+#endif  /* APP_CLI_H */

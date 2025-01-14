@@ -116,6 +116,7 @@ t_NEC_TX NEC_tx;
 static t_testState IR_test_state = TEST_STATE_IDLE;
 static uint8_t IR_test_timeout = 0;
 static uint8_t IR_test_repeat = 0;
+static uint8_t IR_test_triggered = 0;
 
 /*******************************************************************************
 * LOCAL FUNCTION PROTOTYPES
@@ -144,7 +145,21 @@ void NEC_RX_RepeatHandler(void);
 /*******************************************************************************
 * FUNCTIONS
 ********************************************************************************/
+/**
+* @brief flashMemTest_Callback
+*  
+* @retval
+*/
+void irTest_Callback(const char *subcommand, const char *args[], int argc){
 
+    if(strcmp(subcommand,"test") == 0){
+        if (IR_test_state == TEST_STATE_IDLE){
+            IR_test_repeat = 0;
+            IR_test_triggered = 1;
+            app_IR_Test();
+        }
+    }
+}
 /**
 * @brief IR TX-RX Module Test
 *  
@@ -159,9 +174,11 @@ void app_IR_Test(void) {
             PWM_STOP(); 
             NEC_TX_Init(&NEC_tx);
             NEC_RX_Init(&NEC_rx);
-            IR_test_state = TEST_STATE_PROCESS;
-            NEC_RX_StartCapture(&NEC_rx);
-
+            IR_test_timeout = 0;
+            if (IR_test_triggered) {
+                NEC_RX_StartCapture(&NEC_rx);
+                IR_test_state = TEST_STATE_PROCESS;
+            }
             break;
         }
         case TEST_STATE_PROCESS:
@@ -195,18 +212,20 @@ void app_IR_Test(void) {
                     } 
                 }
             }
-            if (++IR_test_timeout >= TICK_5_SEC/10)
+            if (++IR_test_timeout >= TICK_2_SEC/10)
             {
-                
-                printf("\r[IRMODUL-TX-RX] Error,signal receive timeout\n");
-                if (IR_test_repeat < IRMODUL_TRIAL_COUNT-1)
-                    IR_test_state = TEST_STATE_PASSED;
-                else
-                    IR_test_state = TEST_STATE_FAILED;
+                printf("\r[IRMODUL_TX-RX] Signal receive timeout,try again\n");
+                IR_test_state = TEST_STATE_FAILED;
             }        
             break;
         }
         case TEST_STATE_PASSED:
+        {
+            printf("\r[IRMODUL-TX-RX] Test Completed Successfully..\r\n");
+            IR_test_state = TEST_STATE_DONE;
+            break;
+        }
+       case TEST_STATE_FAILED:
         {
             if (IR_test_repeat < IRMODUL_TRIAL_COUNT-1){
                 App_Delay(25);         // wait 0.25sec
@@ -216,31 +235,21 @@ void app_IR_Test(void) {
             }
             else
             {
-                printf("\r[IRMODUL-TX-RX] Test Completed Successfully..\r\n");
+                printf("\r[IRMODUL_TX-RX -ERROR] Test Failed !...\n");
                 IR_test_state = TEST_STATE_DONE;
             }
-
-            break;
-        }
-       case TEST_STATE_FAILED:
-        {
-            printf("\r[IRMODUL-TX-RX] Test Failed,Press RESET button to try again !...\n");
-
-            IR_test_state = TEST_STATE_DONE;
-            PWM_STOP();    
             break;
         }
        case TEST_STATE_DONE:
         {
             NEC_RX_StopCapture(&NEC_rx);        
             PWM_STOP();
-
+            IR_test_state = TEST_STATE_IDLE;
+            IR_test_triggered = 0;
             break;
         }
  
     }
-
-
 }
 /**
  * @brief  NEC protocol decoded
@@ -297,8 +306,6 @@ void NEC_RX_Init(t_NEC_RX* handle) {
     handle->Rx_ErrorCallback = NEC_RX_ErrorHandler;
     handle->Rx_RepeatCallback = NEC_RX_RepeatHandler;
 
-    if (IR_test_repeat == 0)
-        printf("[IRMODUL-RX] state_init with TIM2_CH1\r\n");
 }
 /**
  * @brief  NEC-RX init state and start to capture signals
@@ -429,8 +436,6 @@ void NEC_TX_Init(t_NEC_TX* handle) {
     handle->Tx_XmitCallback = NEC_TX_SendMarkSpace;
     handle->state = NEC_TX_STATE_IDLE;
 
-    if (IR_test_repeat == 0)
-        printf("\r\n[IRMODUL-TX] state_init with TIM3_CH2\n");
 }
 /**
  * @brief  NEC-TX NEC_TX_XmitHandler

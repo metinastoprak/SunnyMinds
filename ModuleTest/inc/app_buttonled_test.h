@@ -38,7 +38,7 @@
 * EXPORTED FUNCTIONS
 ********************************************************************************/
 INTERFACE void app_buttonLed_Test(void);
-
+INTERFACE void ledTest_Callback(const char *subcommand, const char *args[], int argc);
 
 
 

@@ -26,11 +26,11 @@
 * LOCAL VARIABLES
 ********************************************************************************/
 /*buffer that will be writtten n times to the external memory  */
-uint8_t aTxBuffer[] ="**OCTOSPI/Quadspi SunnyMind Memorymapped communication example****OCTOSPI/Quadspi SunnyMind Memorymapped communication example**\
+unsigned char aTxBuffer[] ="**OCTOSPI/Quadspi SunnyMind Memorymapped communication example****OCTOSPI/Quadspi SunnyMind Memorymapped communication example**\
 **OCTOSPI/Quadspi SunnyMind Memorymapped communication example****OCTOSPI/Quadspi SunnyMind Memorymapped communication example**";
 
 __IO uint8_t *mem_addr;
-static char aRxBuffer[256];
+static unsigned char aRxBuffer[256];
 
 /* Exported macro -----------------------------------------------------*/
 #define COUNTOF(__BUFFER__) (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
@@ -49,6 +49,7 @@ void app_qspi_ChipERASE(void);
 void app_qspi_ReadDeviceID(void);
 void app_qspi_WriteEnable(void);
 void app_qspi_WriteDisable(void);
+void app_qspi_ReadPage(uint16_t pageCount);
 
 uint8_t app_qspi_WriteMemoryPAGE(uint8_t* buffer, uint32_t address);
 uint8_t app_qspi_ReadMemoryPAGE(uint8_t* buffer, uint32_t address);
@@ -61,54 +62,104 @@ uint8_t app_qspi_EnableMemoryMappedMode(void);
 /*******************************************************************************
 * FUNCTIONS
 ********************************************************************************/
+/**
+* @brief app_qspi_Init
+*  
+* @retval None
+*/
+void app_qspi_Init(void) {
+    app_qspi_ResetChip();
+    app_qspi_ChipERASE();
+    app_qspi_ReadDeviceID();
+}
+/**
+* @brief flashMemTest_Callback
+*  
+* @retval
+*/
+void flashMemTest_Callback(const char *subcommand, const char *args[], int argc){
+    //printf("[LED] 'led %s' command execution\r\n", subcommand);
+    char command[MAX_COMMAND_LENGTH]={0};
 
+    // add Subcommand
+    strncat(command, subcommand, sizeof(command) - 1);
+
+    // add Args
+    for (int i = 0; i < argc; i++){
+        strncat(command, " ", sizeof(command) - strlen(command) - 1); // Boşluk ekle
+        strncat(command, args[i], sizeof(command) - strlen(command) - 1);
+    }
+
+    if (strcmp(command,"getID") == 0){
+        app_qspi_ReadDeviceID();
+    }
+    else if(strcmp(command,"chiperase") == 0){
+        app_qspi_ChipERASE();
+    }
+    else if(strcmp(subcommand,"testpages") == 0){
+        int arg = app_cli_getNumber(args[0]);
+        if (arg != INVALID_NUMBER && arg >= 0){
+            app_qspi_Test(arg);             
+        }
+        else
+            printf("[QSPI-ERROR] invalid number '%d' \r\n",arg);    
+    }
+    else if(strcmp(subcommand,"readpage") == 0){
+        int arg = app_cli_getNumber(args[0]);
+        if (arg != INVALID_NUMBER && arg >= 0){
+            app_qspi_ReadPage(arg);             
+        }    
+        else
+            printf("[QSPI-ERROR] invalid number '%d' \r\n",arg);    
+    }
+
+}
 /**
 * @brief app_qspi_Test
 *  
 * @retval None
 */
-void app_qspi_Test(void) {
+void app_qspi_Test(uint16_t pageCount) {
 
-    static UINT _initQSPI = 0;
-    uint16_t pagecnt;
+    unsigned int i;
 
-    if (!_initQSPI) {
-        app_qspi_ResetChip();
-        app_qspi_ChipERASE();
-        app_qspi_ReadDeviceID();
-        HAL_Delay(250);
-        for (pagecnt = 0; pagecnt < PAGE_TEST_COUNT; pagecnt++) {
-            // write test pattern chars
-            if (app_qspi_WriteMemoryPAGE(aTxBuffer, pagecnt*MEMORY_PAGE_SIZE) != HAL_OK) {
-                printf("[QSPI] WritePAGE Error \r\n");       
-                Error_Handler();
-            }
+    for (i = 0; i < pageCount; i++) {
+        // write test pattern chars
+        if (app_qspi_WriteMemoryPAGE(aTxBuffer,i*MEMORY_PAGE_SIZE) != HAL_OK) {
+            printf("[QSPI-ERROR] WritePAGE Error at %d \r\n",i);       
         }
-        HAL_Delay(250);
-        printf("\r\n[QSPI] Test Pattern Write completed for %d Memory PAGE\r\n",PAGE_TEST_COUNT);
-        // Verify Patterns
-        for (pagecnt = 0; pagecnt < PAGE_TEST_COUNT; pagecnt++) {
-
-            // clear buffer before reading device     
-            memset(aRxBuffer, 0, sizeof(aRxBuffer));    
-            if (app_qspi_ReadMemoryPAGE(aRxBuffer,pagecnt*MEMORY_PAGE_SIZE) != HAL_OK) {
-                printf("[QSPI] Page READ ERROR at page:%d.. \r\n",pagecnt);       
-                Error_Handler();
-            }
-            // compare PAGE
-            if (memcmp(aTxBuffer,aRxBuffer,MEMORY_PAGE_SIZE) != HAL_OK) {
-
-                printf("[QSPI] Pattern Verificaiton ERROR at page:%d.. \r\n",pagecnt);       
-                Error_Handler();
-            }
-            HAL_Delay(1);
-        }
-        printf("[QSPI] Test Pattern verification SUCCESS!..\r\n");
-
-        _initQSPI = 1;
     }
-}
+    HAL_Delay(250);
+    printf("\r\n[QSPI-INFO] Test Pattern writing success\r\n");
+    // Verify Patterns
+    for (i = 0; i < pageCount; i++) {
 
+        // clear buffer before reading device     
+        memset(aRxBuffer, 0, sizeof(aRxBuffer));    
+        if (app_qspi_ReadMemoryPAGE(aRxBuffer,i*MEMORY_PAGE_SIZE) != HAL_OK) {
+            printf("[QSPI-ERROR] Page READ ERROR at page:%d.. \r\n",i);       
+        }
+        // compare PAGE
+        if (memcmp(aTxBuffer,aRxBuffer,MEMORY_PAGE_SIZE) != HAL_OK) {
+            printf("[QSPI-ERROR] Pattern Verificaiton ERROR at page:%d.. \r\n",i);       
+        }
+        HAL_Delay(1);
+    }
+    printf("[QSPI-INFO] Test Pattern verification SUCCESS!..\r\n");
+}
+/**
+* @brief app_qspi_ReadPage
+*  
+* @retval None
+*/
+void app_qspi_ReadPage(uint16_t pageCount){
+
+    memset(aRxBuffer, 0, sizeof(aRxBuffer));    
+    if (app_qspi_ReadMemoryPAGE(&aRxBuffer[0],pageCount*MEMORY_PAGE_SIZE) != HAL_OK) {
+        printf("[QSPI-ERROR] Page READ ERROR at page:%d.. \r\n",pageCount);       
+    }
+    printf("[QSPI-INFO] page'%d'->%s \r\n",pageCount,aRxBuffer);       
+}
 /**
 * @brief QUADSPI Write Memory-Page (256 Byte)
 *  
@@ -272,18 +323,18 @@ void app_qspi_ResetChip(void)
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] Chip RESET, OSPI init failed. \r\n");return;
     }
     sCommand.Instruction = QSPI_CMD_RESET_DEVICE;
 
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] Chip RESET sending command failed. \r\n");
     }
     else
     {
-        printf("[QSPI] Chip RESET done.. \r\n");
+        printf("[QSPI-INFO] Chip RESET done.. \r\n");
         HAL_Delay(10);
     }
 }
@@ -307,15 +358,15 @@ void app_qspi_ChipERASE(void)
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] Chip ERASE, OSPI init failed. \r\n");return;
     }
     
     if (app_qspi_AutoPollingMemReady() != HAL_OK) {
-         Error_Handler();
+        printf("[QSPI-ERROR] Chip Erasing failed. \r\n");
     }
     else
     {
-        printf("[QSPI] Chip Erasing DONE!.. \r\n");
+        printf("[QSPI-INFO] Chip Erasing DONE!.. \r\n");
         HAL_Delay(250);    
     }
 }
@@ -340,8 +391,9 @@ void app_qspi_WriteEnable(void)
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] WRITE_ENABLE failed. \r\n");
     }
+    HAL_Delay(10);
 }
 /**
 * @brief QUADSPI WriteDisable
@@ -364,8 +416,9 @@ void app_qspi_WriteDisable(void)
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] WRITE_DISABLE failed. \r\n");
     }
+    HAL_Delay(10);
 }
 
 /**
@@ -397,18 +450,18 @@ void app_qspi_ReadDeviceID(void)
     /* Send Comamnd */
     if (HAL_XSPI_Command(&hospi1, &sCommand, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] SPI command failed. \r\n");
     }
-
     /* Read JEDEC ID via Quad Read mode 1-0-1*/ 
-    if (HAL_XSPI_Receive(&hospi1, &aRxBuffer[0], HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    if (HAL_XSPI_Receive(&hospi1,aRxBuffer, HAL_XSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        Error_Handler();
+        printf("[QSPI-ERROR] Read device ID failed. \r\n");
     }
     else
     {
-        printf("[QSPI] ManufactID:0x%02X DeviceID-1:0x%02X DeviceID-2:0x%02X \r\n",aRxBuffer[0],aRxBuffer[1],aRxBuffer[2]); 
+        printf("[QSPI-INFO] ManufactID:0x%02X DeviceID-1:0x%02X DeviceID-2:0x%02X \r\n",aRxBuffer[0],aRxBuffer[1],aRxBuffer[2]); 
     }
+    HAL_Delay(10);
 }
 
 

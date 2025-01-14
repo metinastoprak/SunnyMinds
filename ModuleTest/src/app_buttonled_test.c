@@ -44,35 +44,61 @@
 */
 void app_buttonLed_Test(void) {
 
-    ULONG currentValue = 0;
-    UINT state;
-    char * name;
+    
+    static char buttonPressed = 0;
 
-    if (tx_semaphore_get(&semaphore_ledcheck, TX_NO_WAIT) == TX_SUCCESS)
+    if (!buttonPressed && tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT) == TX_SUCCESS)
     {
-        name = "LED1 Thread";
-        tx_semaphore_info_get(&semaphore_ledcheck, NULL, &currentValue, NULL, NULL, NULL);
-        printf("\r\n[BUTTON-LED] user button pressed\r\n");
+        buttonPressed = 1; 
+        tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT);   
+        printf("\r\n[BUTTON] user button pressed, LEDs flashes.. \r\n");
+    }
+    else if (buttonPressed) {
+        HAL_GPIO_TogglePin(USER_LED1_GPIO_Port,USER_LED1_Pin);
+        HAL_GPIO_TogglePin(USER_LED2_GPIO_Port,USER_LED2_Pin);
 
-        if (tx_thread_info_get(&thread_Led1,&name,&state,NULL,NULL,NULL,NULL,NULL,NULL) == TX_SUCCESS) {
-
-            if (state == TX_SUSPENDED){
-                // resume LEDx threads    
-                printf("[BUTTON-LED] LEDs blinking\r\n");
-                tx_thread_resume(&thread_Led1);
-                tx_thread_resume(&thread_Led2);
-            
-            }
-            else{
-                // test completed, suspend LEDx threads
-                tx_thread_suspend(&thread_Led1);
-                tx_thread_suspend(&thread_Led2);
-                HAL_GPIO_WritePin(USER_LED1_GPIO_Port,USER_LED1_Pin,GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(USER_LED2_GPIO_Port,USER_LED2_Pin,GPIO_PIN_RESET);
-                printf("[BUTTON-LED] turnoff LEDs \r\n");    
-            }
+        if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port,USER_BUTTON_Pin) == 0) {
+            HAL_GPIO_WritePin(USER_LED1_GPIO_Port,USER_LED1_Pin,GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(USER_LED2_GPIO_Port,USER_LED2_Pin,GPIO_PIN_RESET);
+            buttonPressed = 0;
+            tx_semaphore_get(&semaphore_buttonpress, TX_NO_WAIT); 
         }
     }
+}
+/**
+* @brief ledTest_Callback
+*  
+* @retval
+*/
+void ledTest_Callback(const char *subcommand, const char *args[], int argc) {
+    //printf("[LED] 'led %s' command execution\r\n", subcommand);
+    char command[MAX_COMMAND_LENGTH]={0};
+ 
+    // add Subcommand
+    strncat(command, subcommand, sizeof(command) - 1);
+
+    tx_thread_suspend(&thread_Led1);
+    tx_thread_suspend(&thread_Led2);
+
+    // add Args
+    for (int i = 0; i < argc; i++) {
+        strncat(command, " ", sizeof(command) - strlen(command) - 1); // Boşluk ekle
+        strncat(command, args[i], sizeof(command) - strlen(command) - 1);
+    }
+
+    if (strcmp(command,"red off") == 0){
+        HAL_GPIO_WritePin(USER_LED1_GPIO_Port,USER_LED1_Pin,GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(USER_LED2_GPIO_Port,USER_LED2_Pin,GPIO_PIN_RESET);
+    }
+    else if(strcmp(command,"red on") == 0){
+        HAL_GPIO_WritePin(USER_LED1_GPIO_Port,USER_LED1_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(USER_LED2_GPIO_Port,USER_LED2_Pin,GPIO_PIN_SET);
+    }
+    else if(strcmp(command,"red blink") == 0){
+        tx_thread_resume(&thread_Led1);
+        tx_thread_resume(&thread_Led2);
+    }
+
 }
 
 /**
